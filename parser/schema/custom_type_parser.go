@@ -264,6 +264,8 @@ astFieldsLoop:
 			p.addOverrideExample(astFieldTag, fieldSchema)
 			p.addRequiredField(astFieldTag, isRequired, structSchema, name)
 			p.addDescription(astFieldTag, fieldSchema)
+			p.addType(astFieldTag, fieldSchema)
+			p.addFormat(astFieldTag, fieldSchema)
 			p.addReference(astFieldTag, fieldSchema)
 			p.addEnum(astFieldTag, fieldSchema)
 			p.addTitle(astFieldTag, fieldSchema)
@@ -363,6 +365,7 @@ astFieldsLoop:
 
 						structSchema.Properties.Set(propertyName, refPropertySchema)
 					}
+					structSchema.Required = append(structSchema.Required, refSchema.Required...)
 				}
 			}
 			continue
@@ -520,6 +523,7 @@ func (p *parser) addTitle(astFieldTag reflect.StructTag, fieldSchema *SchemaObje
 func (p *parser) addEnum(astFieldTag reflect.StructTag, fieldSchema *SchemaObject) {
 	if enumValues := astFieldTag.Get("enum"); enumValues != "" {
 		fieldSchema.Enum = parseEnumValues(enumValues)
+		fieldSchema.Ref = "" // remove ref in case of enum
 	}
 }
 
@@ -533,6 +537,20 @@ func (p *parser) addReference(astFieldTag reflect.StructTag, fieldSchema *Schema
 func (p *parser) addDescription(astFieldTag reflect.StructTag, fieldSchema *SchemaObject) {
 	if desc := astFieldTag.Get("description"); desc != "" {
 		fieldSchema.Description = desc
+	}
+}
+
+func (p *parser) addType(astFieldTag reflect.StructTag, fieldSchema *SchemaObject) {
+	if ty := astFieldTag.Get("type"); ty != "" {
+		fieldSchema.Type = ty
+		fieldSchema.Ref = ""
+		fieldSchema.Items = nil
+	}
+}
+
+func (p *parser) addFormat(astFieldTag reflect.StructTag, fieldSchema *SchemaObject) {
+	if format := astFieldTag.Get("format"); format != "" {
+		fieldSchema.Format = format
 	}
 }
 
