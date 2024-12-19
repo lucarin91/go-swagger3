@@ -523,6 +523,7 @@ func (p *parser) addTitle(astFieldTag reflect.StructTag, fieldSchema *SchemaObje
 func (p *parser) addEnum(astFieldTag reflect.StructTag, fieldSchema *SchemaObject) {
 	if enumValues := astFieldTag.Get("enum"); enumValues != "" {
 		fieldSchema.Enum = parseEnumValues(enumValues)
+		fieldSchema.Ref = "" // remove ref in case of enum
 	}
 }
 
